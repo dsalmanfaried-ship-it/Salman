@@ -21,9 +21,7 @@
     { name: "ياسر الدوسري", title: "تلاوات ياسر الدوسري", url: "https://soundcloud.com/tvquran22/sets/yaser", kind: "list" },
     { name: "عمر ضياء الدين", title: "تلاوة عمر ضياء الدين", url: "https://soundcloud.com/omar-ebrahim-565006892/rlm6erqddvtl", kind: "track" },
     { name: "بلال سيف", title: "تلاوات بلال سيف", url: "https://soundcloud.com/ttejcjk820wj", kind: "profile" },
-    url: "https://soundcloud.com/holyquranofficial/sets/ahmed-al-ajamy", kind: "list" }
-  ]
-
+    
   const LS = "deen:sc:custom";
   const getCustom = () => { try { return JSON.parse(localStorage.getItem(LS)) || []; } catch (e) { return []; } };
   const setCustom = (a) => { try { localStorage.setItem(LS, JSON.stringify(a)); } catch (e) {} };
