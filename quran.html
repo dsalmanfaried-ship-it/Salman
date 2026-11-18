@@ -62,144 +62,69 @@ header p{margin:0;color:var(--mut)}
 .av img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
 .rc{position:relative}.cam{position:absolute;top:8px;left:8px;z-index:3;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#000a;color:#fff;font-size:15px;cursor:pointer;border:1px solid var(--gold);transition:transform .2s}.cam:hover{transform:scale(1.15)}.cam input{display:none}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
+
+.srch{margin:6px 0;display:flex;gap:6px}.srch input{flex:1;padding:9px 12px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--txt);font:inherit}
+.sg{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}.sg .pl{border-radius:12px;padding:9px 6px;text-align:center}
+.mh{color:var(--gold2);font-size:13px;margin:8px 4px 2px}.sp{display:flex;gap:6px;justify-content:center;margin:2px 0}.sp button{font-size:12px!important;border:1px solid var(--line)!important;border-radius:99px;padding:2px 10px!important}
 </style>
 </head>
 <body>
 <main>
-<header><div class="mo">🌙</div><h1>القرآن بأصوات تريح السمع</h1><p>فجريات وتلاوات كاملة من ساوند كلاود</p></header>
-<div class="note" id="nt"></div>
-<div class="tools"><input id="q" placeholder="🔍 دوّر باسم القارئ أو السورة"><button id="rnd">🎲 فاجئني</button></div>
+<header><div class="mo">🌙</div><h1>القرآن بأصوات تريح السمع</h1><p>تلاوات كاملة بصوت مباشر، من غير ساوند كلاود ولا يوتيوب</p></header>
+<div class="note" id="nt">⏳ جاري تحميل قوائم القرّاء…</div>
+<div class="tools"><input id="q" placeholder="🔍 دوّر باسم أي قارئ (من كل القرّاء)"><button id="rnd">🎲 فاجئني</button></div>
 <div id="list"></div>
 </main>
-<div id="pl"><div class="h"><div class="bars" id="bars"><i></i><i></i><i></i><i></i></div><div class="tt"><b id="pt"></b><small id="pa"></small></div><button id="pm" title="تصغير">▾</button><button id="px" title="إغلاق">✕</button></div>
-<div class="ctl"><input type="range" id="sk" min="0" max="1000" value="0"><div class="tm"><span id="t1">0:00</span><span id="t2">0:00</span></div><div class="bt"><button id="b0" title="السابق">⏮</button><button id="b1" title="رجوع ١٥ ثانية">↺15</button><button id="bp">▶</button><button id="b2" title="تقديم ١٥ ثانية">15↻</button><button id="b3" title="التالي">⏭</button></div><a id="sl" target="_blank" rel="noopener">المصدر: SoundCloud ↗</a></div><div id="pf"></div></div>
+<div id="pl"><div class="h"><div class="bars" id="bars"><i></i><i></i><i></i><i></i></div><div class="tt"><b id="pt"></b><small id="pa"></small></div><button id="pm">▾</button><button id="px">✕</button></div>
+<div class="ctl"><input type="range" id="sk" min="0" max="1000" value="0"><div class="tm"><span id="t1">0:00</span><span id="t2">0:00</span></div><div class="bt"><button id="b0">⏮</button><button id="b1">↺15</button><button id="bp">▶</button><button id="b2">15↻</button><button id="b3">⏭</button></div><div class="sp"><button data-r="0.85">0.85×</button><button data-r="1">1×</button><button data-r="1.25">1.25×</button></div></div></div>
+<audio id="au" preload="none"></audio>
+<script src="quran-data.js"></script>
 <script>
-const EMBED=true;
-const SC="https://soundcloud.com/";
-const R=[
-{n:"الشيخ ناصر القطامي: الفجريات",e:"🌅",fj:1,it:[
- {t:"كل تلاواته (القناة الرسمية)",p:"nasseralqtami_channel",s:1},
- {t:"فجرية ١٢-١٠-١٤٤٠",p:"nasseralqtami_channel/12-10-1440a",f:1},
- {t:"فجرية ١٦-١٠-١٤٤٠",p:"nasseralqtami_channel/16-10-1440",f:1},
- {t:"فجرية نادرة باكية، من سورة الأعراف",p:"ayaat_06/31-1",f:1},
- {t:"فجرية هادئة ٦ رمضان ١٤٤٠",p:"almuhinimosque/yl41wfcqiikt",f:1},
- {t:"سورة فاطر",p:"quransoundd6/fatir-nasser-alqatami"},
- {t:"سورة غافر",p:"quransoundd7/ghafir-nasser-alqatami"}]},
-{n:"الشيخ محمد عبادة",e:"🌙",it:[
- {t:"كل تلاواته (القناة الرسمية)",p:"mohoobada",s:1},
- {t:"تلاوات القارئ محمد عبادة (قائمة)",p:"3omayr/sets/etv5flzzvf3i",s:1},
- {t:"قرآن كريم بصوت الشيخ محمد عبادة (قائمة)",p:"mahmoud-zakaria-ahmed/sets/wcgpgnsb74ew",s:1},
- {t:"تلاوات الشيخ محمد عبادة (قائمة)",p:"aljarhyly730/sets/mrv5cchwypd8",s:1},
- {t:"سورة يوسف كاملة",p:"mohoobada/youssef-by-mohamed-ebada"},
- {t:"سورة ق كاملة، تلاوة باكية",p:"mohoobada/oxvedzenbr9k"},
- {t:"سورة الأنعام، قيام رمضان ١٤٤٠",p:"mohoobada/quran1440"},
- {t:"سورة يونس، تهجد رمضان ١٤٣٥",p:"mohoobada/14351o"},
- {t:"سورة الأعراف",p:"fattabe3quranah/khxmofmnfai0"}]},
-{n:"الشيخ أحمد نصر",e:"🕌",it:[
- {t:"قيام رمضان من مسجد العدوي (الحساب)",p:"elnasr1990",s:1},
- {t:"أجمل تلاوات أحمد عبدالرزاق نصر (قائمة)",p:"tvquran22/sets/ahns",s:1},
- {t:"تلاوات الشيخ أحمد عبدالرزاق نصر (قائمة)",p:"w-ashrakt/sets/9ch03yh1guof",s:1},
- {t:"تلاوات أحمد عبدالرازق نصر الجديدة (قائمة)",p:"omar-ebrahim-565006892/sets/ihlgx3skngc1",s:1},
- {t:"سورة الروم",p:"mokhbton/surah-ar-rum-sheikh-ahmed-nasr"},
- {t:"سورة فصلت",p:"ahmed-nasr-707718293/hs6nhg6wwigy"},
- {t:"سورة نوح، مسجد العدوي",p:"elnasr1990/qgnnrj2g4wag"},
- {t:"سورة سبأ، قيام ٢٢ رمضان ١٤٣٩",p:"elnasr1990/22-1439a"},
- {t:"تراويح ليلة ٢٣ رمضان، مسجد النور بالشارقة",p:"mokhbton/1az05tbtm8rz"}]},
-{n:"دكتور أحمد العربي",e:"📖",it:[
- {t:"تلاوات د. أحمد العربي (قائمة تراتيل)",p:"trateel_mans/sets/aelarby",s:1},
- {t:"تلاوات الدكتور أحمد العربي (قائمة)",p:"sehamshine/sets/fuk5pkny0xwo",s:1},
- {t:"تلاوات د. أحمد العربي (قائمة)",p:"ahmed-aamer-650222270/sets/nys2ptbsbe8e",s:1},
- {t:"سورة ق كاملة، رمضان ١٤٤٥",p:"omar-ebrahim-565006892/dx7mrlh7dklh"},
- {t:"سورة مريم",p:"trateel_mans/eblv5tqecdbo"},
- {t:"سورة الرعد",p:"fattabe3quranah/rohqrcv4x5kt"},
- {t:"سورة النساء، رمضان ١٤٤٥",p:"6dvehisbt71g/6ckkybrbnchv"},
- {t:"سورة التوبة",p:"omnia-mohamed-464546940/2ndthvs8e01r"}]},
-{n:"الشيخ أحمد النفيس",e:"✨",it:[
- {t:"كل تلاواته (الحساب)",p:"ahmad_alnufais",s:1},
- {t:"سورة القمر، ترتيل عراقي",p:"ahmad_alnufais/busr98v5udyl"},
- {t:"سورة يس، تلاوة هادئة",p:"ahmad_alnufais/fx1zjbizcoew"},
- {t:"سورة الملك",p:"ahmad_alnufais/dduddqeubgwy"},
- {t:"فواتح سورة النحل، مقام اللامي",p:"ahmad_alnufais/b3hjb2jycep2"},
- {t:"تلاوة حجازية: شهر رمضان الذي أنزل فيه القرآن",p:"tvtilawat/7gaz"},
- {t:"سورة المؤمنون",p:"a_bayomii/jvdvndim556u"},
- {t:"سورة الفرقان من مسجد الفارس ١٤٣٥",p:"aziz-alawad/1435-4"},
- {t:"سيقولون لله، ترتيل عراقي",p:"quran_karim12/kns7ziazxet1"}]},
-{n:"الشيخ عبدالله القرافي",e:"🤍",it:[
- {t:"تلاوة تأملية: آخر الأنبياء",p:"tvquran22/alqr"},
- {t:"قراءة جميلة لسورة السجدة",p:"tvquran22/qrf12"},
- {t:"صباحية مع القارئ عبدالله القرافي",p:"pqrzi3wbpqko/sdjwy6nyydel"}]},
-{n:"الشيخ ياسر الدوسري",e:"🕋",it:[
- {t:"نوادر تلاوات ياسر الدوسري (قائمة)",p:"tvquran22/sets/yaser",s:1},
- {t:"تلاوات من فروض الحرم المكي (قائمة)",p:"osama-mohamed-677211579/sets/txkmjmaqnfyw",s:1},
- {t:"تلاوات الشيخ ياسر الدوسري (قائمة)",p:"omar-khaled-922268312/sets/iltodysiw2xs",s:1},
- {t:"أجمل تلاواته النادرة، إصدار الفوالق ١٤٢٤",p:"tvquran22/yas4"},
- {t:"تلاوات الحرم المكي رمضان ١٤٤٦",p:"pqrzi3wbpqko/29338ca6-a8af-4e53-885c-52a7ed3d8ef5"},
- {t:"أخشع تلاواته على مقام الصبا",p:"user-564183167/ekhc85nuqns8"},
- {t:"تلاوة مقام العراق",p:"tvtilawat/yaser-aldosry-3ra8"},
- {t:"تلاوة هادئة من سورة الحجر",p:"y_dossari/fnnm6wmxbbrd"}]},
-{n:"عمر بن نصر",e:"🌿",it:[],q:"عمر بن نصر تلاوة"},
-{n:"القارئ عمر ضياء الدين",e:"🌸",it:[
- {t:"ساعة كاملة بدون مؤثرات",p:"omar-ebrahim-565006892/rlm6erqddvtl"},
- {t:"سورة يوسف كاملة",p:"abdo-ashraf-973126496/s3zgcp16wj81"},
- {t:"سورة يس",p:"omar-ebrahim-565006892/9lghbwxa8kv4"},
- {t:"سورة الكهف",p:"omar-ebrahim-565006892/idpmdxsfuolz"},
- {t:"سورة فاطر",p:"omar-ebrahim-565006892/qt19amdxqhfo"},
- {t:"سورة النور",p:"omar-ebrahim-565006892/ykx19zlps3tj"},
- {t:"أشهر تلاواته من آل عمران",p:"omar-ebrahim-565006892/rhks03wottrv"},
- {t:"سورة ق",p:"s-k-l-187712355/surah-qaf-mp3_160k-mp3"},
- {t:"من سورة الأنعام",p:"kstlokstlo5/mp3"}]},
-{n:"القارئ بلال سيف",e:"⭐",it:[
- {t:"كل تلاواته (الحساب)",p:"ttejcjk820wj",s:1},
- {t:"القارئ بلال سيف (قائمة)",p:"ahmed-eldmrdash-432270705/sets/vevckwkdqcxd",s:1},
- {t:"الشيخ بلال سيف (قائمة)",p:"kareem-khaled-806403427/sets/sqcr4tnoicnp",s:1},
- {t:"بلال سيف (قائمة)",p:"mostafa-gobara-3/sets/k4m1ldu04plj",s:1},
- {t:"سورة القيامة",p:"fattabe3quranah/oj2cxuak0fjd"},
- {t:"ما تيسر من سورة النمل",p:"tajweed/1jjzwy8ducmq"},
- {t:"من سورة هود",p:"kyakus6bz0t4/mp3"},
- {t:"تلاوة للقارئ بلال سيف",p:"ayman-ali-447589892/hbl4w1udhxip"}]}
-];
-const KEYS=['qatami','ebada','nasr','araby','nafees','qarafi','dosari','omarbn','diaa','bilal'];
-let PH={};try{PH=JSON.parse(localStorage.getItem('qph')||'{}')}catch(_){}
-const $=s=>document.querySelector(s),L=$("#list"),pl=$("#pl"),pf=$("#pf"),pt=$("#pt");
+const D=window.QDATA,$=s=>document.querySelector(s),L=$("#list"),au=$("#au"),pl=$("#pl");
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-let FV={};try{FV=JSON.parse(localStorage.getItem("qfav")||"{}")}catch(_){}
-const svf=()=>{try{localStorage.setItem("qfav",JSON.stringify(FV))}catch(_){}};
-const art=(h,fj)=>'<svg viewBox="0 0 100 100"><defs><linearGradient id="g'+h+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl('+h+',55%,38%)"/><stop offset="1" stop-color="hsl('+(h+50)+',60%,12%)"/></linearGradient></defs><rect width="100" height="100" fill="url(#g'+h+')"/>'+(fj?'<circle cx="50" cy="70" r="22" fill="#ffd27a" opacity=".9"/>':'<path d="M70 18a16 16 0 1 0 8 28a13 13 0 1 1-8-28z" fill="#f6e3a1"/>')+'<path d="M18 100V70q0-8 8-8h4q0-14 20-14t20 14h4q8 0 8 8v30z" fill="#06150f" opacity=".85"/><rect x="47" y="30" width="6" height="18" fill="#06150f" opacity=".85"/><circle cx="50" cy="28" r="3" fill="#f6e3a1"/><circle cx="20" cy="22" r="1.5" fill="#fff"/><circle cx="34" cy="12" r="1" fill="#fff"/><circle cx="84" cy="60" r="1.2" fill="#fff"/></svg>';
-const burst=(x,y,a)=>{(a||["♪","✨","🤍","⭐","🌙"]).forEach((t,i)=>{const d=document.createElement("div");d.className="fxp";d.textContent=t;d.style.left=x+(Math.random()-.5)*40+"px";d.style.top=y+"px";d.style.setProperty("--dx",(Math.random()-.5)*120+"px");d.style.animationDelay=i*.05+"s";document.body.appendChild(d);setTimeout(()=>d.remove(),1300)})};
-function draw(q){L.innerHTML="";let any=false;R.forEach((r,i)=>{const items=r.it.filter(x=>!q||(r.n+" "+x.t).includes(q));if(q&&!items.length&&!r.n.includes(q))return;any=true;
-const d=document.createElement("div");d.className="rc"+(r.fj?" fj":"");d.style.setProperty("--h",(i*41+130)%360);d.style.setProperty("--i",i);
-d.innerHTML='<button class="hd"><div class="av">'+(PH[KEYS[i]]?'<img alt="" src="'+PH[KEYS[i]]+'">':(EMBED?'<img alt="" src="photos/'+KEYS[i]+'.jpg" onerror="this.outerHTML=this.dataset.a" data-a="'+art((i*41+130)%360,r.fj).replace(/"/g,'&quot;')+'">':art((i*41+130)%360,r.fj)))+'</div><div><b>'+esc(r.n)+(r.fj?'<i class="bd">فجريات</i>':'')+'</b><small>'+(r.it.length?r.it.length+" تلاوة":"ابحث عن تلاواته")+'</small></div><span class="ar">▾</span></button><div class="ls">'+(r.it.length?(q?items:r.it).map(x=>{const id=x.p;return '<div class="it"><span>'+esc(x.t)+(x.s?'<i class="tg">قائمة</i>':'')+(x.f?'<i class="bd">فجرية</i>':'')+'</span><button class="hb2'+(FV[id]?" on":"")+'" data-f="'+id+'">'+(FV[id]?"♥":"♡")+'</button><button class="pl" data-p="'+id+'" data-n="'+esc(r.n)+'" data-t="'+esc(x.t)+'" data-s="'+(x.s?1:0)+'">'+(EMBED?"▶ شغّل":"▶ افتح")+'</button>'+(EMBED?'<a class="ex" target="_blank" rel="noopener" href="'+SC+id+'">↗</a>':'')+'</div>'}).join(""):'<div class="none">مالقيتش صفحة تلاوات مؤكدة بالاسم ده.</div><div class="it"><span>دوّر في ساوند كلاود</span><a class="pl" target="_blank" rel="noopener" href="'+SC+'search?q='+encodeURIComponent(r.q)+'">🔎 بحث</a></div>')+'</div>';
-{const c=document.createElement("label");c.className="cam";c.title="ارفع صورة الشيخ";c.innerHTML='📷<input type="file" accept="image/*">';c.onclick=e=>e.stopPropagation();c.querySelector("input").onchange=e=>{const f=e.target.files[0];if(!f)return;const im=new Image();im.onload=()=>{const cv=document.createElement("canvas");cv.width=cv.height=220;const m=Math.min(im.width,im.height);cv.getContext("2d").drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,220,220);PH[KEYS[i]]=cv.toDataURL("image/jpeg",.82);try{localStorage.setItem("qph",JSON.stringify(PH))}catch(_){}burst(innerWidth/2,200,["✨","🌙","⭐"]);draw($("#q").value.trim())};im.src=URL.createObjectURL(f)};d.appendChild(c)}
-d.querySelector(".hd").onclick=e=>{d.classList.toggle("open");burst(e.clientX,e.clientY,["✨","🌙"])};if(q||r.fj&&!L.children.length)d.classList.add("open");L.appendChild(d)});
-if(!any)L.innerHTML='<div class="note">مفيش نتيجة</div>'}
-const SIL="UklGRsQPAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YaAPAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA",keep=new Audio("data:audio/wav;base64,"+SIL);keep.loop=true;
-let W=null,dur=0,pos=0,pp=false,drag=false,lastA="",lastN="";const ms=navigator.mediaSession;
-const fmt=m=>{const s=Math.floor(Math.max(0,m)/1000);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
-const loadSC=()=>new Promise(r=>{if(window.SC&&SC.Widget)return r();const s=document.createElement("script");s.src="https://w.soundcloud.com/player/api.js";s.onload=r;document.head.appendChild(s)});
-const meta=(t,a,im)=>{try{if(ms)ms.metadata=new MediaMetadata({title:t,artist:a,album:"اسمع دين",artwork:[{src:im||"icon-512.png",sizes:"512x512",type:"image/png"}]})}catch(_){}};
-const ui=()=>{$("#bp").textContent=pp?"⏸":"▶";$("#bars").classList.toggle("on",pp);try{if(ms)ms.playbackState=pp?"playing":"paused"}catch(_){}};
-const H=(k,f)=>{try{if(ms)ms.setActionHandler(k,f)}catch(_){}};
-function bind(){const E=SC.Widget.Events;
- W.bind(E.PLAY,()=>{pp=true;ui();keep.play().catch(()=>{});W.getDuration(d=>{dur=d});W.getCurrentSound(s=>{if(!s)return;lastN=s.title||lastN;$("#pa").textContent=lastN;$("#sl").href=s.permalink_url||"#";meta(lastN,lastA,(s.artwork_url||"").replace("-large","-t500x500")||null)})});
- W.bind(E.PAUSE,()=>{pp=false;ui();keep.pause()});W.bind(E.FINISH,()=>{pp=false;ui()});
- W.bind(E.PLAY_PROGRESS,d=>{pos=d.currentPosition;if(!drag)$("#sk").value=dur?Math.min(1000,pos/dur*1000):0;$("#t1").textContent=fmt(pos);$("#t2").textContent=fmt(dur);try{if(ms&&ms.setPositionState&&dur)ms.setPositionState({duration:dur/1000,position:Math.min(pos,dur)/1000,playbackRate:1})}catch(_){}})}
-H("play",()=>W&&W.play());H("pause",()=>W&&W.pause());H("previoustrack",()=>W&&W.prev());H("nexttrack",()=>W&&W.next());
-H("seekbackward",()=>W&&W.seekTo(Math.max(0,pos-15000)));H("seekforward",()=>W&&W.seekTo(pos+15000));H("seekto",d=>W&&W.seekTo(d.seekTime*1000));
-async function play(p,n,t,s,x,y){burst(x,y);lastA=n;lastN=t;const u=SC+p;
- pl.className="on";$("#pt").textContent=n;$("#pa").textContent=t;$("#sl").href=u;$("#sk").value=0;$("#t1").textContent="0:00";$("#t2").textContent="…";$("#pm").textContent="▾";meta(t,n);keep.play().catch(()=>{});
- await loadSC();const Q="&auto_play=true&visual=false&show_comments=false&hide_related=true&show_teaser=false&buying=false&sharing=false&download=false&liking=false";
- if(!W){pf.innerHTML='<iframe id="sc" allow="autoplay" title="'+esc(t)+'" src="https://w.soundcloud.com/player/?url='+encodeURIComponent(u)+Q+'"></iframe>';W=SC.Widget($("#sc"));bind()}else W.load(u,{auto_play:true})}
-$("#bp").onclick=()=>{if(!W)return;pp?W.pause():W.play()};$("#b0").onclick=()=>W&&W.prev();$("#b3").onclick=()=>W&&W.next();
-$("#b1").onclick=()=>W&&W.seekTo(Math.max(0,pos-15000));$("#b2").onclick=()=>W&&W.seekTo(pos+15000);
-$("#sk").oninput=e=>{drag=true;$("#t1").textContent=fmt(dur*e.target.value/1000)};$("#sk").onchange=e=>{if(W&&dur)W.seekTo(dur*e.target.value/1000);drag=false};
-L.addEventListener("click",e=>{const b=e.target.closest("button.pl[data-p]");if(b){play(b.dataset.p,b.dataset.n,b.dataset.t,+b.dataset.s,e.clientX,e.clientY);return}
-const f=e.target.closest("button[data-f]");if(f){const k=f.dataset.f;FV[k]=!FV[k];svf();f.classList.toggle("on",!!FV[k]);f.textContent=FV[k]?"♥":"♡";if(FV[k])burst(e.clientX,e.clientY,["❤️","✨","❤️"])}});
-$("#q").oninput=e=>draw(e.target.value.trim());
-$("#rnd").onclick=e=>{const all=[];R.forEach(r=>r.it.forEach(x=>{if(!x.s)all.push([r,x])}));const [r,x]=all[Math.floor(Math.random()*all.length)];play(x.p,r.n,x.t,0,e.clientX,e.clientY)};
+const nz=s=>String(s).replace(/[\u064B-\u0652\u0640]/g,"").replace(/[أإآ]/g,"ا").replace(/ة/g,"ه").replace(/ى/g,"ي").replace(/ؤ/g,"و").replace(/ئ/g,"ي").toLowerCase();
+const p3=n=>String(n).padStart(3,"0"),fmt=s=>{s=Math.floor(Math.max(0,s||0));return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
+let ALL=[],UX={};try{UX=JSON.parse(localStorage.getItem("qx")||"{}")}catch(_){}
+let queue=[],qi=-1;
+async function load(){
+ try{const c=JSON.parse(localStorage.getItem("mq3")||"null");if(c&&Date.now()-c.t<6048e5){ALL=c.d;return true}}catch(_){}
+ try{const r=await fetch(D.API),j=await r.json();ALL=(j.reciters||[]).map(x=>({id:x.id,name:x.name,mo:(x.moshaf||[]).map(m=>({n:m.name,s:m.server,l:String(m.surah_list||"").split(",").filter(Boolean).map(Number)}))}));
+  try{localStorage.setItem("mq3",JSON.stringify({t:Date.now(),d:ALL}))}catch(_){}return true}catch(_){return false}}
+const find=r=>ALL.filter(x=>r.m.every(w=>nz(x.name).includes(nz(w))));
+function items(r){const out=[];find(r).forEach(x=>x.mo.forEach(m=>{out.push({t:x.name+" — "+m.n,mo:m})}));return out}
+function card(r,i,list,open){const f=items(r),ex=(r.extra||[]).concat(UX[r.n]||[]);
+ return '<div class="rc'+(r.fj?' fj':'')+(open?' open':'')+'" style="--h:'+((i*41+130)%360)+';--i:'+i+'"><button class="hd"><div class="av">'+r.e+'</div><div><b>'+esc(r.n)+'</b><small>'+(f.length||ex.length?(f.length?f.length+" رواية/مصحف":"")+(ex.length?" · "+ex.length+" رابط":""):"مش موجود في القائمة — ضيف رابط mp3")+'</small></div><span class="ar">▾</span></button><div class="ls">'+
+ f.map((it,k)=>'<div class="mh">'+esc(it.t)+'</div><div class="sg">'+it.mo.l.map(s=>'<button class="pl" data-r="'+i+'" data-m="'+k+'" data-s="'+s+'">'+s+". "+(D.surahs[s-1]||"")+'</button>').join("")+'</div>').join("")+
+ ex.map((e,k)=>'<div class="it"><span>'+esc(e.t)+'</span><button class="pl" data-x="'+i+'" data-k="'+k+'">▶ شغّل</button></div>').join("")+
+ '<div class="it"><span>ضيف رابط mp3 مباشر</span><button class="pl ex" data-a="'+i+'">＋ ضيف</button></div></div></div>'}
+function draw(q){L.innerHTML="";let any=false;const nq=nz(q||"");
+ if(nq){const hit=ALL.filter(x=>nz(x.name).includes(nq)).slice(0,25);
+  if(hit.length){any=true;L.innerHTML=hit.map(x=>'<div class="rc open"><div class="ls" style="display:block;padding-top:12px"><div class="mh">'+esc(x.name)+'</div>'+x.mo.map((m,k)=>'<div class="mh">'+esc(m.n)+'</div><div class="sg">'+m.l.map(s=>'<button class="pl" data-id="'+x.id+'" data-m="'+k+'" data-s="'+s+'">'+s+". "+(D.surahs[s-1]||"")+'</button>').join("")+'</div>').join("")+'</div></div>').join("")}}
+ else D.reciters.forEach((r,i)=>{any=true;L.insertAdjacentHTML("beforeend",card(r,i,null,r.fj))});
+ if(!any)L.innerHTML='<div class="note">مفيش نتيجة</div>';
+ L.querySelectorAll(".hd").forEach(b=>b.onclick=()=>b.parentNode.classList.toggle("open"))}
+function setQ(list,i){queue=list;qi=i;const t=queue[qi];if(!t)return;au.src=t.u;au.play().catch(()=>{});pl.className="on";$("#pt").textContent=t.a;$("#pa").textContent=t.t;
+ try{navigator.mediaSession.metadata=new MediaMetadata({title:t.t,artist:t.a,album:"اسمع دين"})}catch(_){}}
+function surahQueue(mo,name,from){const l=mo.l.map(s=>({u:mo.s.replace(/\/?$/,"/")+p3(s)+".mp3",t:s+". سورة "+(D.surahs[s-1]||""),a:name}));return [l,l.findIndex(x=>x.t.startsWith(from+". "))]}
+L.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+ if(b.dataset.s){let name,mo;if(b.dataset.id){const x=ALL.find(z=>z.id==b.dataset.id);name=x.name;mo=x.mo[+b.dataset.m]}else{const r=D.reciters[+b.dataset.r],it=items(r)[+b.dataset.m];name=r.n;mo=it.mo}const [l,i]=surahQueue(mo,name,b.dataset.s);setQ(l,i)}
+ else if(b.dataset.x){const r=D.reciters[+b.dataset.x],ex=(r.extra||[]).concat(UX[r.n]||[]);setQ(ex.map(z=>({u:z.u,t:z.t,a:r.n})),+b.dataset.k)}
+ else if(b.dataset.a){const r=D.reciters[+b.dataset.a],u=prompt("الصق رابط mp3 مباشر (بينتهي بـ .mp3)");if(!u)return;if(!/^https?:\/\/\S+/i.test(u.trim())){alert("الرابط مش صحيح");return}const t=prompt("اسم التلاوة","تلاوة")||"تلاوة";(UX[r.n]=UX[r.n]||[]).push({t,u:u.trim()});try{localStorage.setItem("qx",JSON.stringify(UX))}catch(_){}draw($("#q").value.trim())}});
+const nxt=()=>{if(qi+1<queue.length)setQ(queue,qi+1)},prv=()=>{if(au.currentTime>5)au.currentTime=0;else if(qi>0)setQ(queue,qi-1)};
+au.onended=nxt;au.onplay=()=>{$("#bp").textContent="⏸";$("#bars").classList.add("on")};au.onpause=()=>{$("#bp").textContent="▶";$("#bars").classList.remove("on")};
+au.onerror=()=>{$("#pa").textContent="⚠️ الملف مش بيشتغل، جرّب تلاوة تانية"};
+au.ontimeupdate=()=>{if(!$("#sk")._d)$("#sk").value=au.duration?au.currentTime/au.duration*1000:0;$("#t1").textContent=fmt(au.currentTime);$("#t2").textContent=fmt(au.duration);try{if(au.duration)navigator.mediaSession.setPositionState({duration:au.duration,position:au.currentTime,playbackRate:au.playbackRate})}catch(_){}};
+$("#bp").onclick=()=>au.paused?au.play():au.pause();$("#b0").onclick=prv;$("#b3").onclick=nxt;
+$("#b1").onclick=()=>au.currentTime=Math.max(0,au.currentTime-15);$("#b2").onclick=()=>au.currentTime+=15;
+$("#sk").oninput=e=>{e.target._d=1;$("#t1").textContent=fmt(au.duration*e.target.value/1000)};$("#sk").onchange=e=>{if(au.duration)au.currentTime=au.duration*e.target.value/1000;e.target._d=0};
+document.querySelectorAll(".sp button").forEach(b=>b.onclick=()=>au.playbackRate=+b.dataset.r);
+const H=(k,f)=>{try{navigator.mediaSession.setActionHandler(k,f)}catch(_){}};H("play",()=>au.play());H("pause",()=>au.pause());H("previoustrack",prv);H("nexttrack",nxt);H("seekbackward",()=>au.currentTime-=15);H("seekforward",()=>au.currentTime+=15);H("seekto",d=>au.currentTime=d.seekTime);
 $("#pm").onclick=e=>{pl.classList.toggle("min");e.target.textContent=pl.classList.contains("min")?"▴":"▾"};
-$("#px").onclick=()=>{try{W&&W.pause()}catch(_){}keep.pause();pl.className="";try{if(ms)ms.metadata=null}catch(_){}};
-$("#nt").innerHTML=EMBED?"🎧 اختار تلاوة وهتشتغل كصوت بس، مع أزرار تحكم وإشعار على شاشة القفل. ثبّت الصفحة على الموبايل كتطبيق عشان تكمّل في الخلفية.":"🎧 اضغط «▶ افتح» جنب أي تلاوة وهتفتح على ساوند كلاود، وتكمّل في الخلفية لو فتحتها من تطبيق ساوند كلاود. ♡ بتحفظ المفضلة عندك.";
+$("#px").onclick=()=>{au.pause();pl.className=""};
+$("#q").oninput=e=>draw(e.target.value.trim());
+$("#rnd").onclick=()=>{const c=[];D.reciters.forEach((r,i)=>items(r).forEach((it,k)=>it.mo.l.forEach(s=>c.push([r,it,s]))));if(!c.length){alert("مفيش تلاوات متاحة لسه");return}const [r,it,s]=c[Math.floor(Math.random()*c.length)],[l,i]=surahQueue(it.mo,r.n,s);setQ(l,i)};
 draw("");
+load().then(ok=>{$("#nt").innerHTML=ok?"🎧 التلاوات صوت مباشر بيشتغل في الخلفية وعلى شاشة القفل. ثبّت الصفحة على الموبايل كتطبيق.":"⚠️ ما قدرتش أحمّل القوائم (النت أو الموقع واقف). التلاوات اللي ضفت روابطها بإيدك لسه شغالة.";draw($("#q").value.trim())});
 </script>
 </body>
 </html>
