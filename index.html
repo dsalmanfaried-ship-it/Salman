@@ -6120,9 +6120,22 @@ d.querySelector('#xo').onclick=()=>{s('myname',d.querySelector('#xn').value.trim
 let SP=null;const gs=()=>SP||(SP=(window.claude&&claude.use?claude.use('sample'):Promise.resolve(null)).catch(()=>null));
 window.xAsk=q=>{const d=mk('xa','<h3>🎙️ اسأل شيخك</h3><small style="color:var(--mut)">ذكاء اصطناعي مش مفتي، وللفتاوى الخاصة ارجع لعالم موثوق.</small><input id="xq" placeholder="اكتب سؤالك في الدين…"><button class="g" id="xg">اسأل</button><div class="ans" id="xr">اسأل أي سؤال.</div>');
 const run=async()=>{const t=d.querySelector('#xq').value.trim(),o=d.querySelector('#xr');if(!t)return;o.textContent='جارٍ التفكير…';const nm=g('myname'),p='أنت «اسأل شيخك»، مساعد ذكاء اصطناعي يجيب عن الأسئلة الدينية بعربية بسيطة (لهجة مصرية خفيفة) على منهج أهل السنة والجماعة. لا تختلق آية أو حديثاً، وانبّه لخلاف المذاهب، وانصح بسؤال عالم موثوق في الفتاوى الخاصة.'+(nm?' اسم السائل '+nm+'.':'')+' السؤال: '+t;
-const url=g('aiurl');try{if(url){const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:p,question:t})});const j=await r.json();o.textContent=j.answer||j.text||'مفيش رد';return}
-const f=await gs();if(!f){o.innerHTML='المرشد محتاج اتصال بالذكاء الاصطناعي: يشتغل لو الموقع منشور على Claude، أو حط رابط خادم (Worker) هنا:<input id="xu" dir="ltr" placeholder="https://…workers.dev"><button class="g" id="xs2">حفظ الرابط</button>';o.querySelector('#xs2').onclick=()=>{s('aiurl',o.querySelector('#xu').value.trim());o.textContent='اتحفظ، اسأل تاني.'};return}
-const r=await f(p,{onText:({text})=>{o.textContent=text}});o.textContent=r.text||o.textContent}catch(e){o.textContent='تعذّر الاتصال بالمرشد الآن.'}};
+const BTN='style="display:inline-block;border-radius:12px;padding:10px 16px;background:var(--gold);color:#1a1405;text-decoration:none;margin:4px 2px;font-weight:700"';
+const norm=x=>x.replace(/[\u064B-\u065F\u0670\u0640]/g,'').replace(/[إأآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه');
+const STOP=new Set(['ازاي','كيف','ماذا','ماهو','هل','ايه','يعني','عن','في','من','على','الي','ان','انا','ده','دي','هو','هي','لو','ما','لما','اللي','او','ممكن','عايز','عاوز','حكم','معني','يجوز','ليه','لماذا']);
+const local=q=>{const w=norm(q).split(/[^\u0621-\u064Aa-z0-9]+/i).filter(x=>x.length>2&&!STOP.has(x)).map(x=>x.replace(/^ال/,'')).filter(x=>x.length>1);if(!w.length)return[];let V=[];try{V=allVideos()}catch(e){}return V.map(v=>{const hs=norm(v.title+' '+v.topic+' '+v.scholar);return[w.filter(x=>hs.includes(x)).length,v]}).filter(x=>x[0]>0).sort((x,y)=>y[0]-x[0]).slice(0,5).map(x=>x[1])};
+const fb=(q,why)=>{const L=local(q),e=encodeURIComponent(q+' (أجب بعربية بسيطة، ولا تختلق آية أو حديثاً، وانبّه لخلاف العلماء إن وُجد)');
+o.innerHTML=(why?'<div>'+why+'</div>':'')+(L.length?'<div style="margin-top:8px"><b>فيديوهات في الموقع عن سؤالك:</b></div>'+L.map(v=>'<div style="margin:6px 0"><a href="#" data-k="'+esc(v.key)+'" style="color:var(--gold)">▶ '+esc(v.title)+'</a> <small style="color:var(--mut)">'+esc(sname(v.scholar))+'</small></div>').join(''):'')+'<div style="margin-top:10px"><b>أو اسأل مباشرة بضغطة واحدة:</b></div><a '+BTN+' target="_blank" rel="noopener" href="https://claude.ai/new?q='+e+'">اسأل Claude ↗</a><a '+BTN+' target="_blank" rel="noopener" href="https://chatgpt.com/?q='+e+'">اسأل ChatGPT ↗</a>';
+o.querySelectorAll('a[data-k]').forEach(x=>x.onclick=ev=>{ev.preventDefault();d.classList.remove('on');openP(x.dataset.k)})};
+const url=g('aiurl');
+try{
+if(url){const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:p,question:t})});const j=await r.json();o.textContent=j.answer||j.text||'مفيش رد';return}
+const f=await gs();
+if(f){const r=await f(p,{onText:({text})=>{o.textContent=text}});o.textContent=r.text||o.textContent;return}
+const ctl=new AbortController(),tm=setTimeout(()=>ctl.abort(),12000);
+try{const r=await fetch('https://text.pollinations.ai/openai',{method:'POST',headers:{'Content-Type':'application/json'},signal:ctl.signal,body:JSON.stringify({model:'openai',messages:[{role:'user',content:p}]})});
+if(!r.ok)throw new Error('http '+r.status);const j=await r.json(),ans=j&&j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;if(!ans)throw new Error('empty');o.textContent=ans;return}finally{clearTimeout(tm)}
+}catch(e){fb(t,'المرشد الذكي المجاني مش متاح دلوقتي.')}};
 d.querySelector('#xg').onclick=run;d.querySelector('#xq').onkeydown=e=>{if(e.key==='Enter')run()}};
 window.xCol=(q)=>{fGroup=null;fScholar=null;fTopic=null;fKind='';query=q;lim=20;tab='explore';render(1);scrollTo(0,0)};
 function deco(){const t=document.querySelector('#app .top');if(t&&!t.querySelector('#me')){const n=g('myname'),p=g('myphoto'),b=document.createElement('button');b.id='me';b.onclick=xProfile;b.innerHTML='<div class="pf">'+(p?'<img src="'+p+'">':(g('myemoji')||esc((n||'+')[0])))+'</div><div class="nm">'+esc(n||'سجّل اسمك')+'</div>';t.appendChild(b)}
