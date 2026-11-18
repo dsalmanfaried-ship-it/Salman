@@ -21,13 +21,8 @@
     { name: "ياسر الدوسري", title: "تلاوات ياسر الدوسري", url: "https://soundcloud.com/tvquran22/sets/yaser", kind: "list" },
     { name: "عمر ضياء الدين", title: "تلاوة عمر ضياء الدين", url: "https://soundcloud.com/omar-ebrahim-565006892/rlm6erqddvtl", kind: "track" },
     { name: "بلال سيف", title: "تلاوات بلال سيف", url: "https://soundcloud.com/ttejcjk820wj", kind: "profile" },
-    { name: "د. عبدالمجيد الطيب عمر", title: "لقاء 34: لغة القرآن وتميزها على سائر لغات العالمين", url: "https://soundcloud.com/tafsircenter/34a-4", kind: "track" },
-    { name: "مركز آيات لتعليم القرآن", title: "سلسلة صُحبة", url: "https://soundcloud.com/ayatqurancenter/sets/sohba", kind: "list" },
-    { name: "الشيخ عمرو الشرقاوي", title: "محاضرات ومقاطع", url: "https://soundcloud.com/itsthequran/sets/druonotv0mqa", kind: "list" },
-    { name: "د. أحمد جلال", title: "سلسلة تفسير القرآن – رمضان 1435", url: "https://soundcloud.com/ahmed-galal-412125487/sets/14a1", kind: "list" },
-    { name: "الشيخ محمد العريفي", title: "دروس وخطب ومحاضرات منوعة", url: "https://soundcloud.com/quran-sunnah/sets/xsme2eglifnr", kind: "list" },
-    { name: "الشيخ أحمد العجمي", title: "القرآن الكريم – تلاوات", url: "https://soundcloud.com/holyquranofficial/sets/ahmed-al-ajamy", kind: "list" }
-  ];
+    url: "https://soundcloud.com/holyquranofficial/sets/ahmed-al-ajamy", kind: "list" }
+  ]
 
   const LS = "deen:sc:custom";
   const getCustom = () => { try { return JSON.parse(localStorage.getItem(LS)) || []; } catch (e) { return []; } };
